@@ -1,0 +1,20 @@
+{
+  "name": "fli-kue",
+  "version": "1.0.0",
+  "description": "Task manager",
+  "main": "index.js",
+  "author": "Dima Kostrub",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.3.0",
+    "basic-auth-connect": "^1.0.0",
+    "cheerio": "^0.22.0",
+    "event-stream": "^3.3.4",
+    "express": "^4.15.2",
+    "feedparser": "^2.2.0",
+    "kue": "^0.11.5",
+    "kue-scheduler": "^0.7.2",
+    "request": "^2.81.0",
+    "safe-eval": "^0.3.0"
+  }
+}

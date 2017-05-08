@@ -1,0 +1,28 @@
+{
+    "user": "",
+    "pass": "",
+    "port": 8062,
+    "redis": {
+        "db": 2,
+        "auth": ""
+    },
+    "add": {
+        "host": "",
+        "token": ""
+    },
+    "rss": {
+        "tasks": [{
+            "title": "",
+            "rss": "",
+            "uid": "",
+            "cid": "",
+            "time": "",
+            "unique": "",
+            "add": {
+                "title": "",
+                "url": "",
+                "date": ""
+            }
+        }]
+    }
+}
