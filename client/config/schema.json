@@ -1,0 +1,47 @@
+{
+    "type": "object",
+    "title": "Config",
+    "properties": {
+        "user": {
+            "type": "string"
+        },
+        "pass": {
+            "type": "string"
+        },
+        "port": {
+            "type": "number",
+            "default": 8062
+        },
+        "redis": {
+            "type": "object",
+            "properties": {
+                "db": {
+                    "type": "number",
+                    "default": 2
+                },
+                "auth": {
+                    "type": "string"
+                }
+            }
+        },
+        "add": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "rss": {
+            "type": "object",
+            "properties": {
+                "tasks": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

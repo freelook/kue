@@ -1,6 +1,6 @@
 module.exports = function(Queue) {
 
-    var CONFIG = require('../config.json');
+    var CONFIG = require('config.json');
 
     var request = require('request');
     var url = require('url');
@@ -16,21 +16,27 @@ module.exports = function(Queue) {
     };
 
     add.write = function(data, done) {
-        request.post({
-            url: [CONFIG.add.host, 'api/v1', '/topics'].join(''),
-            auth: {
-                bearer: CONFIG.add.token
-            },
-            json: {
-                _uid: data.uid,
-                cid: data.cid,
-                title: data.title,
-                content: data.url,
-                timestamp: Date.parse(data.date)
-            }
-        }, function(err, response, body) {
-            done(err);
-        });
+        if (data.active) {
+            request.post({
+                url: [CONFIG.add.host, 'api/v1', '/topics'].join(''),
+                auth: {
+                    bearer: CONFIG.add.token
+                },
+                json: {
+                    _uid: data.uid,
+                    cid: data.cid,
+                    title: data.title,
+                    content: data.url,
+                    timestamp: Date.parse(data.date)
+                }
+            }, function(err, response, body) {
+                done(err);
+            });
+
+        }
+        else {
+            done();
+        }
     };
 
     Queue.process('add', function(job, done) {

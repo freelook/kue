@@ -1,12 +1,12 @@
-module.exports = function(Queue) {
+module.exports = function ModuleRss(Queue) {
 
-    var CONFIG = require('../config.json');
-
+    var CONFIG = require('config.json');
+    var jfs = require('services/jfs.js')(CONFIG.rss.tasks);
     var es = require('event-stream');
     var FeedParser = require('feedparser');
     var request = require('request');
     var safeEval = require('safe-eval');
-    var add = require('./add.js')(Queue);
+    var add = require('tasks/add.js')(Queue);
 
     var rss = {};
 
@@ -18,34 +18,68 @@ module.exports = function(Queue) {
         Queue.every(time, job);
     };
 
-    CONFIG.rss.tasks.map(function(item) {
-        var rssTask = rss.create(item)
-            .priority('normal')
-            .unique(item.unique);
+    ModuleRss.tasks = function(id, tasks, next) {
+        if (id && tasks && next) {
+            jfs.save(id, tasks, next);
+        }
+        else if (id && tasks) {
+            next = tasks;
+            jfs.get(id, next);
+        }
+        else if (id) {
+            next = id;
+            jfs.all(next);
+        }
+        else {
+            return jfs;
+        }
+    };
 
-        rss.every(item.time, rssTask);
+    ModuleRss.parse = function(rss) {
+        return request(rss)
+            .pipe(new FeedParser());
+    };
+
+    ModuleRss.handler = function(task, data) {
+        return {
+            title: safeEval(task.add.title, {
+                data: data,
+                require: require
+            }),
+            url: safeEval(task.add.url, {
+                data: data,
+                require: require
+            }),
+            date: safeEval(task.add.date, {
+                data: data,
+                require: require
+            }),
+            uid: task.uid,
+            cid: task.cid,
+            active: task.active
+        };
+    };
+
+    ModuleRss.tasks(function(err, data) {
+        if (!err && data) {
+            Object.keys(data).map(function(key) {
+                data[key].tasks.map(function(item) {
+                    if (item && item.time) {
+                        var rssTask = rss.create(item)
+                            .priority('normal')
+                            .unique(item.unique);
+
+                        rss.every(item.time, rssTask);
+                    }
+                });
+            });
+        }
     });
 
     Queue.process('rss', function(job, done) {
-        request(job.data.rss)
-            .pipe(new FeedParser())
+        ModuleRss.parse(job.data.rss)
             .pipe(es.map(function(data, next) {
-                add.create({
-                        title: safeEval(job.data.add.title, {
-                            data: data,
-                            require: require
-                        }),
-                        url: safeEval(job.data.add.url, {
-                            data: data,
-                            require: require
-                        }),
-                        date: safeEval(job.data.add.date, {
-                            data: data,
-                            require: require
-                        }),
-                        uid: job.data.uid,
-                        cid: job.data.cid
-                    })
+                add.create(ModuleRss.handler(job.data, data))
                     .priority('normal')
                     .removeOnComplete(true)
                     .save();

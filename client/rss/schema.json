@@ -1,0 +1,59 @@
+{
+    "title": "RSS",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "tasks": {
+            "type": "array",
+            "format": "tabs",
+            "items": {
+                "type": "object",
+                "headerTemplate": "{{self.title}}",
+                "links": [{
+                    "href": "javascript:RSSTest('{{self.unique}}')",
+                    "target": "_self"
+                }],
+                "properties": {
+                    "title": {
+                        "type": "string"
+                    },
+                    "active": {
+                        "type": "boolean",
+                        "format": "checkbox"
+                    },
+                    "rss": {
+                        "type": "string"
+                    },
+                    "uid": {
+                        "type": "string"
+                    },
+                    "cid": {
+                        "type": "string"
+                    },
+                    "time": {
+                        "type": "string"
+                    },
+                    "unique": {
+                        "type": "string"
+                    },
+                    "add": {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "type": "string"
+                            },
+                            "url": {
+                                "type": "string"
+                            },
+                            "date": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

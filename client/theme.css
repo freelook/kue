@@ -1,0 +1,29 @@
+input[type="text"] {
+    width: 90%;
+}
+
+.tabs>div {
+    cursor: pointer;
+}
+
+a {
+    margin: 15px;
+}
+
+textarea {
+    height: 50vh !important;
+    width: 50vw !important;
+}
+
+#reload {
+    color: red;
+}
+
+#loading {
+    color: green;
+}
+
+#submit {
+    float: right;
+    margin: 10px;
+}

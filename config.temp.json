@@ -11,18 +11,6 @@
         "token": ""
     },
     "rss": {
-        "tasks": [{
-            "title": "",
-            "rss": "",
-            "uid": "",
-            "cid": "",
-            "time": "",
-            "unique": "",
-            "add": {
-                "title": "",
-                "url": "",
-                "date": ""
-            }
-        }]
+        "tasks": ""
     }
 }

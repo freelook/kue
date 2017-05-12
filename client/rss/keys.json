@@ -1,0 +1,14 @@
+{
+    "title": "RSS",
+    "type": "array",
+    "format": "tabs",
+    "uniqueItems": true,
+    "items": {
+        "type": "string",
+        "headerTemplate": "{{self}}",
+        "links": [{
+            "href": "/json.html?id={{self}}",
+            "target": "_self"
+        }]
+    }
+}
