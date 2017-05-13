@@ -56,7 +56,7 @@ module.exports = function ModuleRss(Queue) {
             }),
             uid: task.uid,
             cid: task.cid,
-            active: task.active
+            active: task.add.active
         };
     };
 
