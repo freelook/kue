@@ -1,9 +1,8 @@
-module.exports = function(Queue) {
+var CONFIG = require('config.json');
+var request = require('request');
+var url = require('url');
 
-    var CONFIG = require('config.json');
-
-    var request = require('request');
-    var url = require('url');
+function ModuleAdd(Queue) {
 
     var add = {};
 
@@ -15,34 +14,10 @@ module.exports = function(Queue) {
         Queue.schedule(time, job);
     };
 
-    add.write = function(data, done) {
-        if (data.active) {
-            request.post({
-                url: [CONFIG.add.host, 'api/v1', '/topics'].join(''),
-                auth: {
-                    bearer: CONFIG.add.token
-                },
-                json: {
-                    _uid: data.uid,
-                    cid: data.cid,
-                    title: data.title,
-                    content: data.url,
-                    timestamp: Date.parse(data.date)
-                }
-            }, function(err, response, body) {
-                done(err);
-            });
-
-        }
-        else {
-            done();
-        }
-    };
-
     Queue.process('add', function(job, done) {
 
-        var link = url.parse(job.data.url),
-            searchTerm = (link.path.length < 10) ? link.host + link.path : link.path;
+        var link = url.parse(job.data.url);
+        var searchTerm = (link.path.length < 10) ? link.host + link.path : link.path;
         var searchUrl = [CONFIG.add.host, 'api/search?term=', searchTerm].join('');
 
         request
@@ -53,7 +28,7 @@ module.exports = function(Queue) {
                         if (jsonBody && jsonBody.posts && !jsonBody.posts.some(function(item) {
                                 return !!~item.content.indexOf(job.data.url);
                             })) {
-                            add.write(job.data, done);
+                            ModuleAdd.write(job.data, done);
                         }
                         else {
                             done();
@@ -75,4 +50,29 @@ module.exports = function(Queue) {
 
     return add;
 
+}
+
+ModuleAdd.write = function(data, done) {
+    if (data.active) {
+        request.post({
+            url: [CONFIG.add.host, 'api/v1', '/topics'].join(''),
+            auth: {
+                bearer: CONFIG.add.token
+            },
+            json: {
+                _uid: data.uid,
+                cid: data.cid,
+                title: data.title,
+                content: data.url,
+                timestamp: Date.parse(data.date)
+            }
+        }, function(err, response, body) {
+            done(err);
+        });
+    }
+    else {
+        done();
+    }
 };
+
+module.exports = ModuleAdd;
