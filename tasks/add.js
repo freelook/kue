@@ -17,7 +17,7 @@ function ModuleAdd(Queue) {
     Queue.process('add', function(job, done) {
 
         var link = url.parse(job.data.url);
-        var searchTerm = (link.path.length < 10) ? link.host + link.path : link.path;
+        var searchTerm = (link.pathname.length < 10) ? link.host + link.pathname : link.pathname;
         var searchUrl = [CONFIG.add.host, 'api/search?term=', searchTerm].join('');
 
         request
@@ -26,7 +26,7 @@ function ModuleAdd(Queue) {
                     try {
                         var jsonBody = JSON.parse(body);
                         if (jsonBody && jsonBody.posts && !jsonBody.posts.some(function(item) {
-                                return !!~item.content.indexOf(job.data.url);
+                                return !!~item.content.indexOf(searchTerm);
                             })) {
                             ModuleAdd.write(job.data, done);
                         }
