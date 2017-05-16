@@ -18,7 +18,7 @@ function ModuleAdd(Queue) {
 
         var link = url.parse(job.data.url);
         var searchTerm = (link.pathname.length < 10) ? link.host + link.pathname : link.pathname;
-        var searchUrl = [CONFIG.add.host, 'api/search?term=', searchTerm].join('');
+        var searchUrl = [CONFIG.add.host, 'api/search?term=', '"', searchTerm, '"'].join('');
 
         request
             .get(searchUrl, function(err, response, body) {
