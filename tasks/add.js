@@ -64,6 +64,7 @@ ModuleAdd.write = function(data, done) {
                 cid: data.cid,
                 title: data.title,
                 content: data.url,
+                tags: data.tags,
                 timestamp: Date.parse(data.date)
             }
         }, function(err, response, body) {

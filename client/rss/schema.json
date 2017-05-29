@@ -49,6 +49,9 @@
                             },
                             "date": {
                                 "type": "string"
+                            },
+                            "tags": {
+                                "type": "string"
                             }
                         }
                     }

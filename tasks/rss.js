@@ -90,6 +90,10 @@ ModuleRss.handler = function(task, data) {
             data: data,
             require: require
         }),
+        tags: !!task.add.tags ? safeEval(task.add.tags, {
+            data: data,
+            require: require
+        }) : [],
         uid: task.uid,
         cid: task.cid,
         active: task.add.active
