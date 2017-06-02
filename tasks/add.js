@@ -1,6 +1,5 @@
 var CONFIG = require('config.json');
 var request = require('request');
-var url = require('url');
 
 function ModuleAdd(Queue) {
 
@@ -16,18 +15,15 @@ function ModuleAdd(Queue) {
 
     Queue.process('add', function(job, done) {
 
-        var link = url.parse(job.data.url);
-        var searchTerm = (link.pathname.length < 10) ? link.host + link.pathname : link.pathname;
-        var searchUrl = [CONFIG.add.host, 'api/search?term=', '"', searchTerm, '"'].join('');
+        var link = job.data.url;
+        var searchUrl = [CONFIG.add.host, 'api/search?term=', '"', link, '"'].join('');
 
         request
             .get(searchUrl, function(err, response, body) {
                 if (!err && response.statusCode === 200) {
                     try {
                         var jsonBody = JSON.parse(body);
-                        if (jsonBody && jsonBody.posts && !jsonBody.posts.some(function(item) {
-                                return !!~item.content.indexOf(searchTerm);
-                            })) {
+                        if (jsonBody && jsonBody.posts && !jsonBody.posts.length) {
                             ModuleAdd.write(job.data, done);
                         }
                         else {
