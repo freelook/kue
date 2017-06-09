@@ -43,8 +43,8 @@ function ModuleRss(Queue) {
                     .removeOnComplete(true)
                     .save();
                 next();
-            })).on('error', function(error) {
-                done(error);
+            })).on('error', function(err) {
+                done(new Error(err));
             }).on('end', function() {
                 done();
             });

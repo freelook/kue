@@ -30,16 +30,16 @@ function ModuleAdd(Queue) {
                             done();
                         }
                     }
-                    catch (e) {
-                        done(e);
+                    catch (err) {
+                        done(new Error(err));
                     }
                 }
                 else {
-                    done(err);
+                    done(new Error(err));
                 }
             })
-            .on('error', function(error) {
-                done(error);
+            .on('error', function(err) {
+                done(new Error(err));
             });
 
     });
@@ -64,7 +64,7 @@ ModuleAdd.write = function(data, done) {
                 timestamp: Date.parse(data.date)
             }
         }, function(err, response, body) {
-            done(err);
+            done(new Error(err));
         });
     }
     else {
