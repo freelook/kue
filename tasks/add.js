@@ -64,7 +64,7 @@ ModuleAdd.write = function(data, done) {
                 timestamp: Date.parse(data.date)
             }
         }, function(err, response, body) {
-            done(new Error(err));
+            done(err);
         });
     }
     else {
