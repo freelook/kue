@@ -4,6 +4,8 @@ var es = require('event-stream');
 var FeedParser = require('feedparser');
 var request = require('request');
 var safeEval = require('safe-eval');
+var scrapeIt = require('scrape-it');
+var async = require('async');
 
 function ModuleRss(Queue) {
 
@@ -13,6 +15,13 @@ function ModuleRss(Queue) {
 
     rss.create = function(config) {
         return Queue.createJob('rss', config);
+    };
+
+    rss.createAdd = function(item) {
+        return add.create(item)
+            .priority('normal')
+            .removeOnComplete(true)
+            .save();
     };
 
     rss.every = function(time, job) {
@@ -27,7 +36,6 @@ function ModuleRss(Queue) {
                         var rssTask = rss.create(item)
                             .priority('normal')
                             .unique(item.unique);
-
                         rss.every(item.time, rssTask);
                     }
                 });
@@ -36,18 +44,38 @@ function ModuleRss(Queue) {
     });
 
     Queue.process('rss', function(job, done) {
-        ModuleRss.parse(job.data.rss)
-            .pipe(es.map(function(data, next) {
-                add.create(ModuleRss.handler(job.data, data))
-                    .priority('normal')
-                    .removeOnComplete(true)
-                    .save();
-                next();
-            })).on('error', function(err) {
-                done(new Error(err));
-            }).on('end', function() {
-                done();
-            });
+        if (job.data.html && job.data.items) {
+            async.waterfall([
+                function(next) {
+                    ModuleRss.scrape(job.data, next);
+                },
+                function(res, next) {
+                    if (res && res.items) {
+                        res.items.map(function(data) {
+                            rss.createAdd(ModuleRss.handler(job.data, data));
+                        });
+                        next();
+                    }
+                    else {
+                        next(new Error('No items found.'));
+                    }
+                }
+            ], done);
+        }
+        else if (job.data.rss) {
+            ModuleRss.parse(job.data.rss)
+                .pipe(es.map(function(data, next) {
+                    rss.createAdd(ModuleRss.handler(job.data, data));
+                    next();
+                })).on('error', function(err) {
+                    done(new Error(err));
+                }).on('end', function() {
+                    done();
+                });
+        }
+        else {
+            done();
+        }
     });
 
     return rss;
@@ -76,6 +104,12 @@ ModuleRss.parse = function(rss) {
         .pipe(new FeedParser());
 };
 
+ModuleRss.scrape = function(data, next) {
+    scrapeIt(data.html, {
+        items: data.items
+    }, next);
+};
+
 ModuleRss.handler = function(task, data) {
     return {
         title: safeEval(task.add.title, {
@@ -86,10 +120,10 @@ ModuleRss.handler = function(task, data) {
             data: data,
             require: require
         }),
-        date: safeEval(task.add.date, {
+        date: !!task.add.date ? safeEval(task.add.date, {
             data: data,
             require: require
-        }),
+        }) : '',
         tags: !!task.add.tags ? safeEval(task.add.tags, {
             data: data,
             require: require

@@ -60,13 +60,25 @@ module.exports = function(app) {
                 var task = data.tasks.find(function(item) {
                     return item.unique === req.params.unique;
                 });
-                return rss.parse(task.rss)
-                    .pipe(es.map(function(config) {
-                        res.json(rss.handler(task, config));
-                    }))
-                    .on('error', function() {});
+                if (task.html && task.items) {
+                    rss.scrape(task, function(err, config) {
+                        if (!!err) {
+                            return res.json(err);
+                        }
+                        res.json(rss.handler(task, config.items[0]));
+                    });
+                }
+                else if (task.rss) {
+                    rss.parse(task.rss)
+                        .pipe(es.map(function(config) {
+                            res.json(rss.handler(task, config));
+                        }))
+                        .on('error', function() {});
+                }
             }
-            sendError(res, err);
+            else {
+                sendError(res, err);
+            }
         });
     });
 
