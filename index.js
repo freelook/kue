@@ -1,4 +1,5 @@
 require('app-module-path').addPath(__dirname);
+require('iconv-lite').skipDecodeWarning = true;
 
 var CONFIG = require('config.json');
 var kue = require('kue-scheduler');
