@@ -55,9 +55,7 @@
                             }
                         }
                     },
-                    "html": {
-                        "type": "string"
-                    },
+                    "html": {},
                     "items": {
                         "type": "object",
                         "properties": {
