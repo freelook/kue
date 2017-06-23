@@ -7,6 +7,8 @@ var safeEval = require('safe-eval');
 var scrapeIt = require('scrape-it');
 var async = require('async');
 
+var CONCURRENT_JOBS = 3;
+
 function ModuleRss(Queue) {
 
     var add = require('tasks/add.js')(Queue);
@@ -43,7 +45,7 @@ function ModuleRss(Queue) {
         }
     });
 
-    Queue.process('rss', function(job, done) {
+    Queue.process('rss', CONCURRENT_JOBS, function(job, done) {
         if (job.data.html && job.data.items) {
             async.waterfall([
                 function(next) {
@@ -51,16 +53,23 @@ function ModuleRss(Queue) {
                 },
                 function(res, next) {
                     if (res && res.items) {
-                        res.items.map(function(data) {
-                            rss.createAdd(ModuleRss.handler(job.data, data));
-                        });
-                        next();
+                        try {
+                            res.items.map(function(data) {
+                                rss.createAdd(ModuleRss.handler(job.data, data));
+                            });
+                            next();
+                        }
+                        catch (err) {
+                            next(new Error(err));
+                        }
                     }
                     else {
                         next(new Error('No items found.'));
                     }
                 }
-            ], done);
+            ], function() {
+                done();
+            });
         }
         else if (job.data.rss) {
             ModuleRss.parse(job.data.rss)
@@ -107,7 +116,9 @@ ModuleRss.parse = function(rss) {
 ModuleRss.scrape = function(data, next) {
     scrapeIt(data.html, {
         items: data.items
-    }, next);
+    }, function(err, res) {
+        next(err, res);
+    });
 };
 
 ModuleRss.handler = function(task, data) {
