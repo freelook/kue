@@ -61,7 +61,7 @@ ModuleAdd.write = function(data, done) {
                 title: data.title,
                 content: data.url,
                 tags: data.tags,
-                timestamp: Date.parse(data.date)
+                timestamp: Date.parse(data.date) || ''
             }
         }, function(err, response, body) {
             done(err);
