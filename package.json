@@ -18,6 +18,7 @@
     "jfs": "^0.2.6",
     "kue": "^0.11.5",
     "kue-scheduler": "^0.7.2",
+    "moment": "^2.18.1",
     "request": "^2.81.0",
     "safe-eval": "^0.3.0",
     "scrape-it": "^3.3.2"
